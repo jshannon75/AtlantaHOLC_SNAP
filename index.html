@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <style>
+        #map {
+            width: "100%";
+            height: 700px;
+        }
+        </style>
+        <title>Atlanta redlining and SNAP authorized retailers</title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="data/Redlinedareas_2.js"></script>
+        <script src="data/SNAPRetailers_3.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        }).fitBounds([[33.68962189232659,-84.48313354217217],[33.86236446964763,-84.2058818757673]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.addAttribution('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a>');
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        var overlay_OpenStreetMap_0 = L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}{r}.png', {
+			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+            subdomains: 'abcd',
+			opacity: 1.0
+        });
+        overlay_OpenStreetMap_0.addTo(map);
+        map.addLayer(overlay_OpenStreetMap_0);
+        var img_HOLCmap_1 = 'data/HOLCmap_1.png';
+        var img_bounds_HOLCmap_1 = [[33.691730424471196,-84.45653059382975],[33.85253378553797,-84.24155588772275]];
+        var overlay_HOLCmap_1 = new L.imageOverlay(img_HOLCmap_1, img_bounds_HOLCmap_1);
+        bounds_group.addLayer(overlay_HOLCmap_1);
+        map.addLayer(overlay_HOLCmap_1);
+        function pop_Redlinedareas_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['id'] !== null ? Autolinker.link(String(feature.properties['id'])) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+        }
+
+        function style_Redlinedareas_2_0() {
+            return {
+                pane: 'pane_Redlinedareas_2',
+                opacity: 1,
+                color: 'rgba(250,5,5,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 3.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(189,27,21,0.2)',
+            }
+        }
+        map.createPane('pane_Redlinedareas_2');
+        map.getPane('pane_Redlinedareas_2').style.zIndex = 402;
+        map.getPane('pane_Redlinedareas_2').style['mix-blend-mode'] = 'normal';
+        var layer_Redlinedareas_2 = new L.geoJson(json_Redlinedareas_2, {
+            attribution: '<a href=""></a>',
+            pane: 'pane_Redlinedareas_2',
+            onEachFeature: pop_Redlinedareas_2,
+            style: style_Redlinedareas_2_0,
+        });
+        bounds_group.addLayer(layer_Redlinedareas_2);
+        map.addLayer(layer_Redlinedareas_2);
+        function pop_SNAPRetailers_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td><b>' + (feature.properties['store_name'] !== null ? Autolinker.link(String(feature.properties['store_name'])) : '') + '</b></td>\
+                    </tr>\
+					<tr>\
+                        <td colspan="2">' + (feature.properties['store_type'] !== null ? Autolinker.link(String(feature.properties['store_type'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['addr_all'] !== null ? Autolinker.link(String(feature.properties['addr_all'])) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['city'] !== null ? Autolinker.link(String(feature.properties['city'])) : '') + ', ' + (feature.properties['state'] !== null ? Autolinker.link(String(feature.properties['state'])) : '') + '  ' + (feature.properties['zip5'] !== null ? Autolinker.link(String(feature.properties['zip5'])) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxWidth: 600});
+        }
+
+        function style_SNAPRetailers_3_0(feature) {
+            switch(String(feature.properties['store_type'])) {
+                case 'Convenience Store':
+                    return {
+                pane: 'pane_SNAPRetailers_3',
+                radius: 4.4,
+                opacity: 1,
+                color: 'rgba(79,77,77,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,192,109,1.0)',
+            }
+                    break;
+                case 'Super Store':
+                    return {
+                pane: 'pane_SNAPRetailers_3',
+                radius: 6.0,
+                opacity: 1,
+                color: 'rgba(69,65,68,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(232,253,73,1.0)',
+            }
+                    break;
+                case 'Supermarket':
+                    return {
+                pane: 'pane_SNAPRetailers_3',
+                radius: 6.0,
+                opacity: 1,
+                color: 'rgba(77,77,77,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(232,253,73,1.0)',
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_SNAPRetailers_3');
+        map.getPane('pane_SNAPRetailers_3').style.zIndex = 403;
+        map.getPane('pane_SNAPRetailers_3').style['mix-blend-mode'] = 'normal';
+        var layer_SNAPRetailers_3 = new L.geoJson(json_SNAPRetailers_3, {
+            attribution: '<a href=""></a>',
+            pane: 'pane_SNAPRetailers_3',
+            onEachFeature: pop_SNAPRetailers_3,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_SNAPRetailers_3_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_SNAPRetailers_3);
+        map.addLayer(layer_SNAPRetailers_3);
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'SNAP Retailers<br /><table><tr><td style="text-align: center;"><img src="legend/SNAPRetailers_3_ConvenienceStore0.png" /></td><td>Convenience Store</td></tr><tr><td style="text-align: center;"><img src="legend/SNAPRetailers_3_SuperStore1.png" /></td><td>Super Store/Supermarket</td></tr></table>': layer_SNAPRetailers_3,'<img src="legend/Redlinedareas_2.png" /> Redlined areas': layer_Redlinedareas_2,"HOLC map": overlay_HOLCmap_1,"OpenStreetMap": overlay_OpenStreetMap_0,},{collapsed:false}).addTo(map);
+        setBounds();
+        L.ImageOverlay.include({
+            getBounds: function () {
+                return this._bounds;
+            }
+        });
+        </script>
+    </body>
+</html>
